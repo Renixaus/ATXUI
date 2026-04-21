@@ -7603,11 +7603,6 @@ am:Animate(an,ai)
 end
 end)
 end
-
-
-
-
-
 else
 if ai.Type=="Toggle"then
 aa.AddSignal(al.ToggleFrame.Hitbox.MouseButton1Click,function()
@@ -7619,6 +7614,14 @@ ai:Set(not ai.Value,nil,ah.Window.NewElements)
 end)
 end
 end
+
+
+
+aa.AddSignal(ai.ToggleFrame.UIElements.Main.MouseButton1Click,function()
+if not ai.Locked then
+ai:Set(not ai.Value,true,false)
+end
+end)
 
 return ai.__type,ai
 end

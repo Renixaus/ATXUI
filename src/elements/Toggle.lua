@@ -111,11 +111,6 @@ function Element:New(Config)
 				end
 			end)
 		end
-		-- Creator.AddSignal(Toggle.ToggleFrame.UIElements.Main.InputEnded, function(input)
-		--     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		--         ToggleFunc:Animate(input, true, Toggle)
-		--     end
-		-- end)
 	else
 		if Toggle.Type == "Toggle" then
 			Creator.AddSignal(ToggleFrame.ToggleFrame.Hitbox.MouseButton1Click, function()
@@ -127,6 +122,14 @@ function Element:New(Config)
 			end)
 		end
 	end
+
+	-- Clicking anywhere on the element row also toggles (child buttons absorb
+	-- their own clicks so this does not double-fire when the widget itself is clicked)
+	Creator.AddSignal(Toggle.ToggleFrame.UIElements.Main.MouseButton1Click, function()
+		if not Toggle.Locked then
+			Toggle:Set(not Toggle.Value, true, false)
+		end
+	end)
 
 	return Toggle.__type, Toggle
 end
