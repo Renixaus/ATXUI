@@ -10,6 +10,7 @@ local Mouse = Players.LocalPlayer:GetMouse()
 
 local Creator = require("../../modules/Creator")
 local New = Creator.New
+local Tween = Creator.Tween
 
 local CreateToolTip = require("../ui/Tooltip").New
 local CreateScrollSlider = require("../ui/ScrollSlider").New
@@ -349,6 +350,8 @@ function TabModule.New(Config, UIScale)
 
 	Tab.ContainerFrame = Tab.UIElements.ContainerFrameCanvas
 
+	New("UIScale", { Scale = 1, Name = "TabBtnScale", Parent = Tab.UIElements.Main })
+
 	Creator.AddSignal(Tab.UIElements.Main.MouseButton1Click, function()
 		if not Tab.Locked then
 			TabModule:SelectTab(TabIndex)
@@ -388,14 +391,40 @@ function TabModule.New(Config, UIScale)
 		end)
 	end
 
-	Creator.AddSignal(Tab.UIElements.Main.MouseEnter, function()
+	local function applyHoverIn()
+		if Tab.Locked or Tab.Selected then return end
+		Creator.SetThemeTag(Tab.UIElements.Main.Frame, {
+			ImageTransparency = "TabBackgroundHoverTransparency",
+			ImageColor3 = "TabBackgroundHover",
+		}, 0.12)
+		if Tab.UIElements.Icon and not Tab.IconColor then
+			Tween(Tab.UIElements.Icon.ImageLabel, 0.12, { ImageTransparency = 0 },
+				Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+		end
+	end
+
+	local function applyHoverOut()
+		if Tab.Locked or Tab.Selected then return end
+		Creator.SetThemeTag(Tab.UIElements.Main.Frame, {
+			ImageTransparency = "TabBorderTransparency",
+		}, 0.15)
+		if Tab.UIElements.Icon and not Tab.IconColor then
+			Creator.SetThemeTag(Tab.UIElements.Icon.ImageLabel, {
+				ImageTransparency = "TabIconTransparency",
+			}, 0.15)
+		end
+	end
+
+	Creator.AddSignal(Tab.UIElements.Main.MouseEnter, applyHoverIn)
+	Creator.AddSignal(Tab.UIElements.Main.MouseLeave, applyHoverOut)
+
+	Creator.AddSignal(Tab.UIElements.Main.MouseButton1Down, function()
 		if not Tab.Locked then
-			Creator.SetThemeTag(Tab.UIElements.Main.Frame, {
-				ImageTransparency = "TabBackgroundHoverTransparency",
-				ImageColor3 = "TabBackgroundHover",
-			}, 0.1)
+			Tween(Tab.UIElements.Main.TabBtnScale, 0.1, { Scale = 0.94 },
+				Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 		end
 	end)
+
 	Creator.AddSignal(Tab.UIElements.Main.InputEnded, function()
 		if Tab.Desc then
 			IsHovering = false
@@ -414,9 +443,8 @@ function TabModule.New(Config, UIScale)
 		end
 
 		if not Tab.Locked then
-			Creator.SetThemeTag(Tab.UIElements.Main.Frame, {
-				ImageTransparency = "TabBorderTransparency",
-			}, 0.1)
+			Tween(Tab.UIElements.Main.TabBtnScale, 0.22, { Scale = 1 },
+				Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
 		end
 	end)
 
@@ -599,6 +627,7 @@ end
 
 function TabModule:SelectTab(TabIndex)
 	if not TabModule.Tabs[TabIndex].Locked then
+		if TabModule.SelectedTab == TabIndex then return end
 		TabModule.SelectedTab = TabIndex
 
 		for _, TabObject in next, TabModule.Tabs do
