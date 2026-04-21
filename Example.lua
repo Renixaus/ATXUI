@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/main/main_example.lua"))()
