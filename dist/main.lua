@@ -12701,84 +12701,6 @@ end
 return aa end function a.aa()
 
 
-local aa=(cloneref or clonereference or function(aa)
-return aa
-end)
-aa(game:GetService"HttpService")
-local ae=a.load'c'
-
-local af={}
-
-function af.Create(ah,aj,ak)
-local al=aj or ah:Tab{
-Title="Theme Editor",
-Icon="palette"
-}
-
-local am=ae.Theme
-
-
-local an={
-"Accent","Background","Text","Button","Icon","Toggle","Slider","Checkbox","Dialog","Placeholder"
-}
-
-for ao,ap in ipairs(an)do
-local aq=am[ap]
-if typeof(aq)=="Color3"then
-al:Colorpicker{
-Title=ap.." Color",
-Default=aq,
-Callback=function(ar)
-ae.Theme[ap]=ar
-ae.UpdateTheme()
-end
-}
-elseif typeof(aq)=="string"and aq:match"^#"then
-al:Colorpicker{
-Title=ap.." Color",
-Default=Color3.fromHex(aq),
-Callback=function(ar)
-ae.Theme[ap]=ar
-ae.UpdateTheme()
-end
-}
-end
-end
-
-al:Button{
-Title="Copy Theme Data",
-Desc="Copies the current theme colors to your clipboard as a Lua table.",
-Icon="clipboard-copy",
-Callback=function()
-local ao="{\n"
-ao=ao..'    Name = "CustomTheme",\n'
-for ap,aq in ipairs(an)do
-local ar=ae.Theme[aq]
-if typeof(ar)=="Color3"then
-ao=ao..string.format('    %s = Color3.fromRGB(%d, %d, %d),\n',aq,math.floor(ar.R*255),math.floor(ar.G*255),math.floor(ar.B*255))
-end
-end
-ao=ao.."}"
-
-if setclipboard then
-setclipboard(ao)
-ak:Notify{
-Title="Theme Copied",
-Content="The theme data has been copied to your clipboard.",
-Duration=3
-}
-else
-warn("setclipboard is not supported on this executor.\n"..ao)
-end
-end
-}
-
-return al
-end
-
-return af end function a.ab()
-
-
 return{
 Tab="table-of-contents",
 Paragraph="type",
@@ -12790,7 +12712,7 @@ Input="text-cursor-input",
 Dropdown="chevrons-up-down",
 Code="terminal",
 Colorpicker="palette",
-}end function a.ac()
+}end function a.ab()
 
 
 local aa=(cloneref or clonereference or function(aa)
@@ -12816,7 +12738,7 @@ Radius=22,
 Width=400,
 MaxHeight=380,
 
-Icons=a.load'ab',
+Icons=a.load'aa',
 }
 
 local ao=ah("TextBox",{
@@ -13340,7 +13262,7 @@ end)
 return an
 end
 
-return ae end function a.ad()
+return ae end function a.ac()
 
 
 
@@ -14418,9 +14340,7 @@ end
 if not f and au.Background and typeof(au.Background)=="table"then
 local v=am"UIGradient"
 for x,z in next,au.Background do
-if x~="Animated"then
 v[x]=z
-end
 end
 
 au.UIElements.BackgroundGradient=al.NewRoundFrame(au.UICorner,"Squircle",{
@@ -14430,21 +14350,6 @@ ImageTransparency=au.Transparent and at.ATXUI.TransparencyValue or 0,
 },{
 v,
 })
-
-if au.Background.Animated then
-task.spawn(function()
-local x=0
-local z
-z=af.RenderStepped:Connect(function(A)
-if not au.UIElements.BackgroundGradient or not au.UIElements.BackgroundGradient.Parent then
-if z then z:Disconnect()end
-return
-end
-x=(x+A*15)%360
-v.Rotation=x
-end)
-end)
-end
 end
 
 
@@ -14998,35 +14903,30 @@ end
 
 local z=a.load'Z'
 local A=a.load'_'
-local B=a.load'aa'
-local C=z.Init(au,at.ATXUI,at.ATXUI.TooltipGui)
-C:OnChange(function(F)
-au.CurrentTab=F
+local B=z.Init(au,at.ATXUI,at.ATXUI.TooltipGui)
+B:OnChange(function(C)
+au.CurrentTab=C
 end)
 
-au.TabModule=C
+au.TabModule=B
 
-function au.CreateThemeEditor(F,G)
-return B.Create(au,G,at.ATXUI)
+function au.TabFolder(C,F)
+F.Parent=au.UIElements.SideBar.Frame
+return B.NewFolder(F,at.ATXUI.UIScale)
 end
 
-function au.TabFolder(F,G)
-G.Parent=au.UIElements.SideBar.Frame
-return C.NewFolder(G,at.ATXUI.UIScale)
+function au.Tab(C,F)
+F.Parent=au.UIElements.SideBar.Frame
+return B.New(F,at.ATXUI.UIScale)
 end
 
-function au.Tab(F,G)
-G.Parent=au.UIElements.SideBar.Frame
-return C.New(G,at.ATXUI.UIScale)
+function au.SelectTab(C,F)
+B:SelectTab(F)
 end
 
-function au.SelectTab(F,G)
-C:SelectTab(G)
-end
-
-function au.Section(F,G)
+function au.Section(C,F)
 return A.New(
-G,
+F,
 au.UIElements.SideBar.Frame,
 au.Folder,
 at.ATXUI.UIScale,
@@ -15034,34 +14934,34 @@ au
 )
 end
 
-function au.IsResizable(F,G)
-au.Resizable=G
-au.CanResize=G
+function au.IsResizable(C,F)
+au.Resizable=F
+au.CanResize=F
 end
 
-function au.SetPanelBackground(F,G)
-if typeof(G)=="boolean"then
-au.HidePanelBackground=G
+function au.SetPanelBackground(C,F)
+if typeof(F)=="boolean"then
+au.HidePanelBackground=F
 
-au.UIElements.MainBar.Background.Visible=G
+au.UIElements.MainBar.Background.Visible=F
 
-if C then
-for H,J in next,C.Containers do
-J.ScrollingFrame.UIPadding.PaddingTop=
+if B then
+for G,H in next,B.Containers do
+H.ScrollingFrame.UIPadding.PaddingTop=
 UDim.new(0,au.HidePanelBackground and 20 or 10)
-J.ScrollingFrame.UIPadding.PaddingLeft=
+H.ScrollingFrame.UIPadding.PaddingLeft=
 UDim.new(0,au.HidePanelBackground and 20 or 10)
-J.ScrollingFrame.UIPadding.PaddingRight=
+H.ScrollingFrame.UIPadding.PaddingRight=
 UDim.new(0,au.HidePanelBackground and 20 or 10)
-J.ScrollingFrame.UIPadding.PaddingBottom=
+H.ScrollingFrame.UIPadding.PaddingBottom=
 UDim.new(0,au.HidePanelBackground and 20 or 10)
 end
 end
 end
 end
 
-function au.Divider(F)
-local G=am("Frame",{
+function au.Divider(C)
+local F=am("Frame",{
 Size=UDim2.new(1,0,0,1),
 Position=UDim2.new(0.5,0,0,0),
 AnchorPoint=Vector2.new(0.5,0),
@@ -15070,110 +14970,110 @@ ThemeTag={
 BackgroundColor3="Text",
 },
 })
-local H=am("Frame",{
+local G=am("Frame",{
 Parent=au.UIElements.SideBar.Frame,
 
 Size=UDim2.new(1,-7,0,5),
 BackgroundTransparency=1,
 },{
-G,
+F,
 })
 
-return H
+return G
 end
 
-local F=a.load'n'
-function au.Dialog(G,H)
-local J={
-Title=H.Title or"Dialog",
-Width=H.Width or 320,
-Content=H.Content,
-Buttons=H.Buttons or{},
+local C=a.load'n'
+function au.Dialog(F,G)
+local H={
+Title=G.Title or"Dialog",
+Width=G.Width or 320,
+Content=G.Content,
+Buttons=G.Buttons or{},
 
 TextPadding=14,
 }
-local L=F.Create(false,"Dialog",au,at.ATXUI,au.UIElements.Main.Main)
+local J=C.Create(false,"Dialog",au,at.ATXUI,au.UIElements.Main.Main)
 
-L.UIElements.Main.Size=UDim2.new(0,J.Width,0,0)
+J.UIElements.Main.Size=UDim2.new(0,H.Width,0,0)
 
-local M=am("Frame",{
+local L=am("Frame",{
 Size=UDim2.new(1,0,1,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
-Parent=L.UIElements.Main,
+Parent=J.UIElements.Main,
 },{
 am("UIListLayout",{
 FillDirection="Vertical",
 
-Padding=UDim.new(0,L.UIPadding),
+Padding=UDim.new(0,J.UIPadding),
 }),
 })
 
-local N=am("Frame",{
+local M=am("Frame",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
-Parent=M,
+Parent=L,
 },{
 am("UIListLayout",{
 FillDirection="Horizontal",
-Padding=UDim.new(0,L.UIPadding),
+Padding=UDim.new(0,J.UIPadding),
 VerticalAlignment="Center",
 }),
 am("UIPadding",{
-PaddingTop=UDim.new(0,J.TextPadding/2),
-PaddingLeft=UDim.new(0,J.TextPadding/2),
-PaddingRight=UDim.new(0,J.TextPadding/2),
+PaddingTop=UDim.new(0,H.TextPadding/2),
+PaddingLeft=UDim.new(0,H.TextPadding/2),
+PaddingRight=UDim.new(0,H.TextPadding/2),
 }),
 })
 
-local O
-if H.Icon then
-O=al.Image(
-H.Icon,
-J.Title..":"..H.Icon,
+local N
+if G.Icon then
+N=al.Image(
+G.Icon,
+H.Title..":"..G.Icon,
 0,
 au,
 "Dialog",
 true,
-H.IconThemed
+G.IconThemed
 )
-O.Size=UDim2.new(0,22,0,22)
-O.Parent=N
+N.Size=UDim2.new(0,22,0,22)
+N.Parent=M
 end
 
-L.UIElements.UIListLayout=am("UIListLayout",{
+J.UIElements.UIListLayout=am("UIListLayout",{
 Padding=UDim.new(0,12),
 FillDirection="Vertical",
 HorizontalAlignment="Left",
 VerticalFlex="SpaceBetween",
-Parent=L.UIElements.Main,
+Parent=J.UIElements.Main,
 })
 
 am("UISizeConstraint",{
 MinSize=Vector2.new(180,20),
 MaxSize=Vector2.new(400,math.huge),
-Parent=L.UIElements.Main,
+Parent=J.UIElements.Main,
 })
 
-L.UIElements.Title=am("TextLabel",{
-Text=J.Title,
+J.UIElements.Title=am("TextLabel",{
+Text=H.Title,
 TextSize=20,
 FontFace=Font.new(al.Font,Enum.FontWeight.SemiBold),
 TextXAlignment="Left",
 TextWrapped=true,
 RichText=true,
-Size=UDim2.new(1,O and-26-L.UIPadding or 0,0,0),
+Size=UDim2.new(1,N and-26-J.UIPadding or 0,0,0),
 AutomaticSize="Y",
 ThemeTag={
 TextColor3="Text",
 },
 BackgroundTransparency=1,
-Parent=N,
+Parent=M,
 })
-if J.Content then
+if H.Content then
 am("TextLabel",{
-Text=J.Content,
+Text=H.Content,
 TextSize=18,
 TextTransparency=0.4,
 TextWrapped=true,
@@ -15187,31 +15087,31 @@ ThemeTag={
 TextColor3="Text",
 },
 BackgroundTransparency=1,
-Parent=M,
+Parent=L,
 },{
 am("UIPadding",{
-PaddingLeft=UDim.new(0,J.TextPadding/2),
-PaddingRight=UDim.new(0,J.TextPadding/2),
-PaddingBottom=UDim.new(0,J.TextPadding/2),
+PaddingLeft=UDim.new(0,H.TextPadding/2),
+PaddingRight=UDim.new(0,H.TextPadding/2),
+PaddingBottom=UDim.new(0,H.TextPadding/2),
 }),
 })
 end
 
-local P=am("UIListLayout",{
+local O=am("UIListLayout",{
 Padding=UDim.new(0,6),
 FillDirection="Horizontal",
 HorizontalAlignment="Center",
 HorizontalFlex="Fill",
 })
 
-local Q=am("Frame",{
+local P=am("Frame",{
 Size=UDim2.new(1,0,0,40),
 AutomaticSize="None",
 BackgroundTransparency=1,
-Parent=L.UIElements.Main,
+Parent=J.UIElements.Main,
 LayoutOrder=4,
 },{
-P,
+O,
 
 
 
@@ -15220,20 +15120,20 @@ P,
 
 })
 
-local R={}
+local Q={}
 
-for S,T in next,J.Buttons do
-local U=ap(
-T.Title,
-T.Icon,
-T.Callback,
-T.Variant,
-Q,
-L,
+for R,S in next,H.Buttons do
+local T=ap(
+S.Title,
+S.Icon,
+S.Callback,
+S.Variant,
+P,
+J,
 true
 )
-table.insert(R,U)
-U.Size=UDim2.new(1,0,1,0)
+table.insert(Q,T)
+T.Size=UDim2.new(1,0,1,0)
 end
 
 
@@ -15288,17 +15188,17 @@ end
 
 
 
-L:Open()
+J:Open()
 
-return L
+return J
 end
 
-local G=false
+local F=false
 
 au:CreateTopbarButton("Close","x",function()
-if not G then
+if not F then
 if not au.IgnoreAlerts then
-G=true
+F=true
 
 au:Dialog{
 
@@ -15309,7 +15209,7 @@ Buttons={
 Title="Cancel",
 
 Callback=function()
-G=false
+F=false
 end,
 Variant="Secondary",
 },
@@ -15317,7 +15217,7 @@ Variant="Secondary",
 Title="Close Window",
 
 Callback=function()
-G=false
+F=false
 au:Destroy()
 end,
 Variant="Primary",
@@ -15330,92 +15230,92 @@ end
 end
 end,(au.Topbar.ButtonsType=="Default"and 999 or 997),nil,Color3.fromHex"#F4695F")
 
-function au.Tag(H,J)
+function au.Tag(G,H)
 if au.UIElements.Main.Main.Topbar.Center.Visible==false then
 au.UIElements.Main.Main.Topbar.Center.Visible=true
 end
-J.Window=au
-return ar:New(J,au.UIElements.Main.Main.Topbar.Center)
+H.Window=au
+return ar:New(H,au.UIElements.Main.Main.Topbar.Center)
 end
 
+local G
 local H
-local J
 
 local function stopResizing()
 if not isResizing then
 return
 end
 isResizing=false
-H=nil
+G=nil
 ay.Active=false
-if J then
-J:Disconnect()
-J=nil
+if H then
+H:Disconnect()
+H=nil
 end
 an(ax.ImageLabel,0.17,{ImageTransparency=0.8}):Play()
 end
 
-local function startResizing(L)
+local function startResizing(J)
 if au.CanResize then
 isResizing=true
 ay.Active=true
 initialSize=au.UIElements.Main.Size
-initialInputPosition=L.Position
-H=L
+initialInputPosition=J.Position
+G=J
 an(ax.ImageLabel,0.1,{ImageTransparency=0.35}):Play()
 
 
 
-if J then
-J:Disconnect()
-J=nil
+if H then
+H:Disconnect()
+H=nil
 end
-J=L.Changed:Connect(function()
-if L.UserInputState==Enum.UserInputState.End then
+H=J.Changed:Connect(function()
+if J.UserInputState==Enum.UserInputState.End then
 stopResizing()
 end
 end)
 end
 end
 
-al.AddSignal(ax.InputBegan,function(L)
+al.AddSignal(ax.InputBegan,function(J)
 if
-L.UserInputType==Enum.UserInputType.MouseButton1
-or L.UserInputType==Enum.UserInputType.Touch
+J.UserInputType==Enum.UserInputType.MouseButton1
+or J.UserInputType==Enum.UserInputType.Touch
 then
 if au.CanResize then
-startResizing(L)
+startResizing(J)
 end
 end
 end)
 
-al.AddSignal(ae.InputChanged,function(L)
+al.AddSignal(ae.InputChanged,function(J)
 if not(isResizing and au.CanResize)then
 return
 end
 
-if L.UserInputType==Enum.UserInputType.Touch then
-if H==nil or L~=H then
+if J.UserInputType==Enum.UserInputType.Touch then
+if G==nil or J~=G then
 return
 end
-elseif L.UserInputType~=Enum.UserInputType.MouseMovement then
+elseif J.UserInputType~=Enum.UserInputType.MouseMovement then
 return
 end
 
-local M=L.Position-initialInputPosition
-local N=
-UDim2.new(0,initialSize.X.Offset+M.X*2,0,initialSize.Y.Offset+M.Y*2)
+local L=J.Position-initialInputPosition
+local M=
+UDim2.new(0,initialSize.X.Offset+L.X*2,0,initialSize.Y.Offset+L.Y*2)
 
-N=UDim2.new(
-N.X.Scale,
-math.clamp(N.X.Offset,au.MinSize.X,au.MaxSize.X),
-N.Y.Scale,
-math.clamp(N.Y.Offset,au.MinSize.Y,au.MaxSize.Y)
+M=UDim2.new(
+M.X.Scale,
+math.clamp(M.X.Offset,au.MinSize.X,au.MaxSize.X),
+M.Y.Scale,
+math.clamp(M.Y.Offset,au.MinSize.Y,au.MaxSize.Y)
 )
 
 
-au.UIElements.Main.Size=N
-au.Size=N
+au.UIElements.Main.Size=M
+au.Size=M
 end)
 
 al.AddSignal(ax.MouseEnter,function()
@@ -15431,52 +15331,52 @@ end)
 
 
 
-local L=0
-local M=0.4
-local N
-local O=0
+local J=0
+local L=0.4
+local M
+local N=0
 
 function onDoubleClick()
 au:SetToTheCenter()
 end
 
 al.AddSignal(l.Frame.MouseButton1Up,function()
-local P=tick()
-local Q=au.Position
+local O=tick()
+local P=au.Position
 
-O=O+1
+N=N+1
 
-if O==1 then
-L=P
-N=Q
+if N==1 then
+J=O
+M=P
 
 task.spawn(function()
-task.wait(M)
-if O==1 then
-O=0
-N=nil
+task.wait(L)
+if N==1 then
+N=0
+M=nil
 end
 end)
-elseif O==2 then
-if P-L<=M and Q==N then
+elseif N==2 then
+if O-J<=L and P==M then
 onDoubleClick()
 end
 
-O=0
-N=nil
-L=0
+N=0
+M=nil
+J=0
 else
-O=1
-L=P
-N=Q
+N=1
+J=O
+M=P
 end
 end)
 
 
 
 if not au.HideSearchBar then
-local P=a.load'ac'
-local Q=false
+local O=a.load'ab'
+local P=false
 
 
 
@@ -15498,18 +15398,18 @@ local Q=false
 
 
 
-local R=ao("Search","search",au.UIElements.SideBarContainer,true)
-R.Size=UDim2.new(1,-au.UIPadding/2,0,39)
-R.Position=UDim2.new(0,au.UIPadding/2,0,0)
+local Q=ao("Search","search",au.UIElements.SideBarContainer,true)
+Q.Size=UDim2.new(1,-au.UIPadding/2,0,39)
+Q.Position=UDim2.new(0,au.UIPadding/2,0,0)
 
-al.AddSignal(R.MouseButton1Click,function()
-if Q then
+al.AddSignal(Q.MouseButton1Click,function()
+if P then
 return
 end
 
-P.new(au.TabModule,au.UIElements.Main,function()
+O.new(au.TabModule,au.UIElements.Main,function()
 
-Q=false
+P=false
 if au.Resizable then
 au.CanResize=true
 end
@@ -15520,18 +15420,18 @@ end)
 an(az,0.1,{ImageTransparency=0.65}):Play()
 az.Active=true
 
-Q=true
+P=true
 au.CanResize=false
 end)
 end
 
 
 
-function au.DisableTopbarButtons(P,Q)
-for R,S in next,Q do
-for T,U in next,au.TopBarButtons do
-if U.Name==S then
-U.Object.Visible=false
+function au.DisableTopbarButtons(O,P)
+for Q,R in next,P do
+for S,T in next,au.TopBarButtons do
+if T.Name==R then
+T.Object.Visible=false
 end
 end
 end
@@ -15831,7 +15731,7 @@ aa:SetTheme"Dark"
 aa:SetLanguage(ao.Language)
 
 function aa.CreateWindow(av,aw)
-local ax=a.load'ad'
+local ax=a.load'ac'
 
 if not ak:IsStudio()and writefile then
 if not isfolder"ATXUI"then
