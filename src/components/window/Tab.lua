@@ -621,6 +621,140 @@ function TabModule.New(Config, UIScale)
 	return Tab
 end
 
+function TabModule.NewFolder(Config, UIScale)
+	local Folder = {
+		__type = "TabFolder",
+		Title = Config.Title or "Folder",
+		Icon = Config.Icon or "folder",
+		Expanded = false,
+		Parent = Config.Parent,
+		Tabs = {},
+	}
+
+	-- Create container
+	local FolderFrame = New("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, -7, 0, 0),
+		AutomaticSize = "Y",
+		Parent = Config.Parent,
+		LayoutOrder = Config.LayoutOrder or 0,
+	}, {
+		New("UIListLayout", {
+			SortOrder = "LayoutOrder",
+			Padding = UDim.new(0, Window.Gap),
+		})
+	})
+
+	local FolderHead = Creator.NewRoundFrame(Window.UICorner - (Window.UIPadding / 2), "Squircle", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = "Y",
+		ThemeTag = { ImageColor3 = "TabBackground" },
+		ImageTransparency = 1,
+		LayoutOrder = 1,
+	}, {
+		Creator.NewRoundFrame(Window.UICorner - (Window.UIPadding / 2), "Squircle", {
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = "Y",
+			ThemeTag = { ImageColor3 = "Text" },
+			ImageTransparency = 1,
+			Name = "Frame",
+		}, {
+			New("UIListLayout", {
+				SortOrder = "LayoutOrder",
+				Padding = UDim.new(0, 2 + (Window.UIPadding / 2)),
+				FillDirection = "Horizontal",
+				VerticalAlignment = "Center",
+			}),
+			New("UIPadding", {
+				PaddingTop = UDim.new(0, 3 + (Window.UIPadding / 2)),
+				PaddingLeft = UDim.new(0, 4 + (Window.UIPadding / 2)),
+				PaddingRight = UDim.new(0, 4 + (Window.UIPadding / 2)),
+				PaddingBottom = UDim.new(0, 3 + (Window.UIPadding / 2)),
+			}),
+		}),
+	}, true)
+
+	local IconFrame = Creator.Image(Folder.Icon, "FolderIcon", 0, Window.Folder, "Folder", true, false, "TabIcon")
+	IconFrame.Size = UDim2.new(0, 16, 0, 16)
+	IconFrame.ImageLabel.ImageTransparency = 0.4
+	IconFrame.Parent = FolderHead.Frame
+
+	local TitleLabel = New("TextLabel", {
+		Text = Folder.Title,
+		ThemeTag = { TextColor3 = "TabTitle" },
+		TextTransparency = 0.4,
+		TextSize = 15,
+		Size = UDim2.new(1, -16 - 16 - 4 - Window.UIPadding, 0, 0),
+		FontFace = Font.new(Creator.Font, Enum.FontWeight.Medium),
+		TextWrapped = true,
+		RichText = true,
+		AutomaticSize = "Y",
+		LayoutOrder = 2,
+		TextXAlignment = "Left",
+		BackgroundTransparency = 1,
+	})
+	TitleLabel.Parent = FolderHead.Frame
+
+	local ChevronIcon = Creator.Image("chevron-down", "Chevron", 0, Window.Folder, "FolderChevron", true, false, "TabIcon")
+	ChevronIcon.Size = UDim2.new(0, 16, 0, 16)
+	ChevronIcon.ImageLabel.ImageTransparency = 0.4
+	ChevronIcon.Parent = FolderHead.Frame
+	ChevronIcon.LayoutOrder = 3
+	ChevronIcon.Rotation = -90
+
+	local ContentFrame = New("Frame", {
+		Size = UDim2.new(1, 0, 0, 0),
+		BackgroundTransparency = 1,
+		AutomaticSize = "Y",
+		LayoutOrder = 2,
+		Visible = false,
+		ClipsDescendants = true,
+	}, {
+		New("UIListLayout", {
+			SortOrder = "LayoutOrder",
+			Padding = UDim.new(0, Window.Gap),
+		}),
+		New("UIPadding", {
+			PaddingLeft = UDim.new(0, 12), -- Tab indent
+		}),
+	})
+
+	FolderHead.Parent = FolderFrame
+	ContentFrame.Parent = FolderFrame
+
+	Creator.AddSignal(FolderHead.MouseButton1Click, function()
+		Folder.Expanded = not Folder.Expanded
+		ContentFrame.Visible = Folder.Expanded
+		Tween(ChevronIcon, 0.2, { Rotation = Folder.Expanded and 0 or -90 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+		Tween(IconFrame.ImageLabel, 0.2, { ImageTransparency = Folder.Expanded and 0.1 or 0.4 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+		Tween(TitleLabel, 0.2, { TextTransparency = Folder.Expanded and 0.1 or 0.4 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+	end, FolderHead)
+
+	local function applyHoverIn()
+		if not Folder.Expanded then
+			Creator.SetThemeTag(FolderHead.Frame, { ImageTransparency = "TabBackgroundHoverTransparency", ImageColor3 = "TabBackgroundHover" }, 0.12)
+		end
+	end
+
+	local function applyHoverOut()
+		Creator.SetThemeTag(FolderHead.Frame, { ImageTransparency = 1 }, 0.15)
+	end
+
+	Creator.AddSignal(FolderHead.MouseEnter, applyHoverIn, FolderHead)
+	Creator.AddSignal(FolderHead.MouseLeave, applyHoverOut, FolderHead)
+
+	function Folder:Tab(TabConfig)
+		TabConfig.Parent = ContentFrame
+		local tab = TabModule.New(TabConfig, UIScale)
+		tab.UIElements.Main.Size = UDim2.new(1, 0, 0, 0) -- Adjust sizing inside folder
+		table.insert(Folder.Tabs, tab)
+		return tab
+	end
+
+	return Folder
+end
+
 function TabModule:OnChange(func)
 	TabModule.OnChangeFunc = func
 end

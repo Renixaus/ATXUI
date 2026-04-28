@@ -1074,7 +1074,9 @@ return function(Config)
 	if not IsVideoBG and Window.Background and typeof(Window.Background) == "table" then
 		local BackgroundGradient = New("UIGradient")
 		for key, value in next, Window.Background do
-			BackgroundGradient[key] = value
+			if key ~= "Animated" then
+				BackgroundGradient[key] = value
+			end
 		end
 
 		Window.UIElements.BackgroundGradient = Creator.NewRoundFrame(Window.UICorner, "Squircle", {
@@ -1084,6 +1086,21 @@ return function(Config)
 		}, {
 			BackgroundGradient,
 		})
+
+		if Window.Background.Animated then
+			task.spawn(function()
+				local t = 0
+				local connection
+				connection = RunService.RenderStepped:Connect(function(dt)
+					if not Window.UIElements.BackgroundGradient or not Window.UIElements.BackgroundGradient.Parent then
+						if connection then connection:Disconnect() end
+						return
+					end
+					t = (t + dt * 15) % 360
+					BackgroundGradient.Rotation = t
+				end)
+			end)
+		end
 	end
 
 	-- local blur = require("../Blur")
@@ -1637,12 +1654,22 @@ return function(Config)
 
 	local TabModuleMain = require("./Tab")
 	local SectionModule = require("./Section")
+	local ThemeEditorModule = require("./ThemeEditor")
 	local TabModule = TabModuleMain.Init(Window, Config.ATXUI, Config.ATXUI.TooltipGui)
 	TabModule:OnChange(function(t)
 		Window.CurrentTab = t
 	end)
 
 	Window.TabModule = TabModule
+
+	function Window:CreateThemeEditor(ParentTab)
+		return ThemeEditorModule.Create(Window, ParentTab, Config.ATXUI)
+	end
+
+	function Window:TabFolder(FolderConfig)
+		FolderConfig.Parent = Window.UIElements.SideBar.Frame
+		return TabModule.NewFolder(FolderConfig, Config.ATXUI.UIScale)
+	end
 
 	function Window:Tab(TabConfig)
 		TabConfig.Parent = Window.UIElements.SideBar.Frame

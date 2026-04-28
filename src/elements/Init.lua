@@ -2,6 +2,7 @@
 return {
 	Elements = {
 		Paragraph = require("./Paragraph"),
+		StatCard = require("./StatCard"),
 		Button = require("./Button"),
 		Toggle = require("./Toggle"),
 		Slider = require("./Slider"),

@@ -1,83 +1,85 @@
 # ATX_UI
 
-A feature-rich Roblox UI library for scripts — smooth micro-animations, glass effects, theming, and a full element suite.
+A modern, feature-rich, and highly customizable UI Library for Roblox scripts. Designed with a focus on fluid micro-animations, premium glassmorphism, and excellent user experience.
 
-> [!WARNING]
-> ATX_UI is currently in Beta. Bugs and unstable features may occur.
+> [!WARNING]  
+> ATX_UI is currently in Beta. You may encounter bugs or unstable features.
 
 ## Installation
 
 ```lua
-local ATXUI = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/main/dist/main.lua"
-))()
+local ATXUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/main/dist/main.lua"))()
 ```
 
-## Quick start
+## Quick Start
 
 ```lua
-local ATXUI = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/main/dist/main.lua"
-))()
-
+local ATXUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/main/dist/main.lua"))()
 ATXUI:SetTheme("Dark")
 
+-- Create a Window with a dynamic animated background
 local Window = ATXUI:CreateWindow({
-    Title     = "My Script",
-    Size      = UDim2.fromOffset(580, 460),
-    Folder    = "MyScript",
-    ToggleKey = Enum.KeyCode.RightControl,
+    Title = "My Premium Hub",
+    Size = UDim2.fromOffset(580, 460),
+    Background = {
+        Animated = true,
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromHex("#1e3a8a")),
+            ColorSequenceKeypoint.new(1, Color3.fromHex("#0f172a"))
+        }),
+    }
 })
 
-local Tab = Window:Tab({ Title = "Main", Icon = "lucide:home" })
+-- Create a Collapsible Tab Folder
+local SettingsFolder = Window:TabFolder({ Title = "Settings", Icon = "settings" })
 
-Tab:Toggle({
-    Title    = "Feature",
-    Value    = false,
-    Callback = function(v) end,
+-- Add a Tab inside the Folder
+local MainTab = SettingsFolder:Tab({ Title = "General", Icon = "home" })
+
+-- Create a Stat Card (Dashboard Element)
+MainTab:StatCard({
+    Title = "Network Ping",
+    Value = "45 ms",
+    Icon = "wifi",
+    Desc = "Current latency"
 })
 
-Tab:Slider({
-    Title    = "Speed",
-    Value    = { Min = 1, Max = 100, Default = 16 },
-    Step     = 1,
-    Callback = function(v) end,
-})
+-- Build-in Theme Editor for your users
+Window:CreateThemeEditor(MainTab)
 ```
 
-A full working example: [main_example.lua](main_example.lua)
+## Key Features
 
-## Features
+🚀 **Modern UI Elements**
+- **18+ Elements** (Stat Cards, Buttons, Toggles, Sliders, Dropdowns, Colorpickers, Keybinds, Code blocks & more)
+- **Grid & Layouts:** `HStack`, `VStack`, `Group`, `Divider`, `Space` for complex dashboard designs.
+- Smooth micro-animations (press, hover, spring transitions).
 
-- Window with sidebar navigation, drag, resize, fullscreen
-- **17 elements** — Button, Toggle, Slider, Dropdown, Input, Keybind, Colorpicker, Paragraph, Code, Image, Divider, Space, Group, HStack, VStack, Section, Label
-- Smooth micro-animations — press, hover, spring transitions
-- Full-row click on toggles (click title/desc area, not just the widget)
-- Mac-style and Default topbar variants
-- **16 built-in themes** + custom theme API + gradient backgrounds
-- ConfigManager — save/load element values as JSON
-- KeySystem — Platoboost / PandaDevelopment / Luarmor / custom validator
-- Notification, Dialog, Popup, Tooltip
-- Localization (multi-language string keys)
-- Acrylic/blur background, AutoScale, mobile open button
+📂 **Advanced Navigation**
+- Sidebar with **Tab Folders** (Collapsible Sub-Tabs).
+- Mac-style or Default topbar variations.
+- Resizable, draggable, and fullscreen-capable windows.
+
+🎨 **Premium Theming & Visuals**
+- **In-Game Theme Editor:** Let users customize and copy their own themes at runtime.
+- **Dynamic Animated Backgrounds:** Rotating background gradients.
+- **Acrylic Glassmorphism:** Live blur effects on supported executors.
+- 16 Built-in themes + custom theme API.
+
+🔔 **Interactive Modals**
+- **Swipe-to-Dismiss Notifications:** Modern notification queue with max-limits and sliding animations.
+- Dialogs, Popups, and Tooltips with rich-text support.
+
+⚙️ **Powerful Utilities**
+- **ConfigManager:** Auto-save and load element values as JSON.
+- **KeySystem:** Built-in integration for Platoboost, PandaDevelopment, Luarmor, or custom validators.
+- Multi-language string keys (Localization).
 
 ## Documentation
 
-| Page | Contents |
-|---|---|
-| [Window & Tab](docs/window.md) | `CreateWindow` config, all window methods, Tab, Dialog, Topbar |
-| [Elements](docs/elements.md) | All 17 elements with config tables and examples |
-| [Advanced](docs/advanced.md) | Themes, Notifications, Popup, ConfigManager, KeySystem, Localization |
-
-## Credits
-
-#### Icons
-- [Lucide Icons](https://github.com/lucide-icons/lucide)
-- [Craft Icons](https://www.figma.com/community/file/1415718327120418204)
-- [Geist Icons](https://vercel.com/geist/icons)
-- [Solar Icons](https://icones.js.org/collection/solar)
-- [SF Symbols](https://sf-symbols-one.vercel.app/)
+- [Window & Tabs](docs/window.md)
+- [UI Elements](docs/elements.md)
+- [Advanced Features](docs/advanced.md)
 
 ## License
-
-MIT
+MIT License
