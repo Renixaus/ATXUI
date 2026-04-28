@@ -838,13 +838,3 @@ function TabModule:SelectTab(TabIndex)
 end
 
 return TabModule
-				)
-					:Play()
-			end
-		end)
-
-		TabModule.OnChangeFunc(TabIndex)
-	end
-end
-
-return TabModule

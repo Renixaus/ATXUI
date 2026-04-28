@@ -968,24 +968,3 @@ function Creator:AddColor(base, add, weight)
 end
 
 return Creator
- and string.sub(base, 1, 1) ~= "#" then
-			baseColor = Creator.GetThemeProperty(base, theme)
-		elseif typeof(base) == "string" then
-			baseColor = Color3.fromHex(base)
-		else
-			baseColor = base
-		end
-
-		if not baseColor or typeof(baseColor) ~= "Color3" then
-			return nil
-		end
-
-		return Color3.new(
-			math.clamp(baseColor.R + add.R * weight, 0, 1),
-			math.clamp(baseColor.G + add.G * weight, 0, 1),
-			math.clamp(baseColor.B + add.B * weight, 0, 1)
-		)
-	end
-end
-
-return Creator
