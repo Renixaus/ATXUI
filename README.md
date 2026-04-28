@@ -15,9 +15,8 @@ local ATXUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixau
 
 ```lua
 local ATXUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/main/dist/main.lua"))()
-ATXUI:SetTheme("Dark")
 
--- Create a Window with a dynamic animated background
+-- 1. Create a Window with a dynamic animated background
 local Window = ATXUI:CreateWindow({
     Title = "My Premium Hub",
     Size = UDim2.fromOffset(580, 460),
@@ -30,22 +29,43 @@ local Window = ATXUI:CreateWindow({
     }
 })
 
--- Create a Collapsible Tab Folder
-local SettingsFolder = Window:TabFolder({ Title = "Settings", Icon = "settings" })
+-- 2. Create a Tab Folder (Collapsible Sub-Tabs)
+local MainFolder = Window:TabFolder({ Title = "Main Features", Icon = "folder" })
 
--- Add a Tab inside the Folder
-local MainTab = SettingsFolder:Tab({ Title = "General", Icon = "home" })
+-- 3. Add a Tab inside the Folder
+local Dashboard = MainFolder:Tab({ Title = "Dashboard", Icon = "home" })
 
--- Create a Stat Card (Dashboard Element)
-MainTab:StatCard({
-    Title = "Network Ping",
-    Value = "45 ms",
-    Icon = "wifi",
-    Desc = "Current latency"
+-- 4. Create Stat Cards for a modern dashboard look
+local StatsGroup = Dashboard:HStack()
+StatsGroup:StatCard({ Title = "Network Ping", Value = "42 ms", Icon = "wifi" })
+StatsGroup:StatCard({ Title = "Client FPS", Value = "60", Icon = "monitor" })
+
+-- 5. Standard elements with micro-animations
+Dashboard:Toggle({
+    Title = "Auto Farm",
+    Desc = "Automatically starts the farming process",
+    Value = false,
+    Callback = function(state)
+        -- 6. Trigger a swipe-to-dismiss notification
+        ATXUI:Notify({
+            Title = "Auto Farm",
+            Content = state and "Successfully started." or "Stopped.",
+            Icon = "info",
+            Duration = 3
+        })
+    end
 })
 
--- Build-in Theme Editor for your users
-Window:CreateThemeEditor(MainTab)
+Dashboard:Slider({
+    Title = "WalkSpeed",
+    Value = { Min = 16, Max = 100, Default = 16 },
+    Callback = function(v)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v
+    end
+})
+
+-- 7. Add the built-in In-Game Theme Editor
+Window:CreateThemeEditor()
 ```
 
 ## Key Features
