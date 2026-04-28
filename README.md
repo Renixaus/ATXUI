@@ -8,13 +8,13 @@ A modern, feature-rich, and highly customizable UI Library for Roblox scripts. D
 ## Installation
 
 ```lua
-local ATXUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/main/dist/main.lua"))()
+local ATXUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/atx/main/dist/main.lua"))()
 ```
 
 ## Quick Start
 
 ```lua
-local ATXUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/main/dist/main.lua"))()
+local ATXUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Renixaus/ATXUI/refs/heads/atx/main/dist/main.lua"))()
 
 -- 1. Create a Window with a dynamic animated background
 local Window = ATXUI:CreateWindow({
