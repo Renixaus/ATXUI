@@ -35,6 +35,7 @@ Creator = {
 	Themes = nil,
 	Icons = Icons,
 	Signals = {},
+	ObjectSignals = {},
 	Objects = {},
 	LocalizationObjects = {},
 	FontObjects = {},

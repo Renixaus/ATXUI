@@ -1644,6 +1644,11 @@ return function(Config)
 
 	Window.TabModule = TabModule
 
+	function Window:TabFolder(FolderConfig)
+		FolderConfig.Parent = Window.UIElements.SideBar.Frame
+		return TabModule.NewFolder(FolderConfig, Config.ATXUI.UIScale)
+	end
+
 	function Window:Tab(TabConfig)
 		TabConfig.Parent = Window.UIElements.SideBar.Frame
 		return TabModule.New(TabConfig, Config.ATXUI.UIScale)
@@ -2194,3 +2199,5 @@ return function(Config)
 
 	return Window
 end
+
+return ATXUI

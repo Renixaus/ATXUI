@@ -3,15 +3,20 @@ local Creator = require("../modules/Creator")
 local New = Creator.New
 local Tween = Creator.Tween
 
+local cloneref = (cloneref or clonereference or function(instance)
+	return instance
+end)
+local UserInputService = cloneref(game:GetService("UserInputService"))
+
 local NotificationModule = {
 	Size = UDim2.new(0, 300, 1, -100 - 56),
 	SizeLower = UDim2.new(0, 300, 1, -56),
 	UICorner = 18,
 	UIPadding = 14,
-	--ButtonPadding = 9,
 	Holder = nil,
 	NotificationIndex = 0,
 	Notifications = {},
+	MaxNotifications = 6, -- Ekranda ayni anda en fazla kac bildirim olabilecegini belirler
 }
 
 function NotificationModule.Init(Parent)
@@ -30,13 +35,9 @@ function NotificationModule.Init(Parent)
 		Size = NotificationModule.Size,
 		Parent = Parent,
 		BackgroundTransparency = 1,
-		--[[ScrollingDirection = "Y",
-        ScrollBarThickness = 0,
-        CanvasSize = UDim2.new(0,0,0,0),
-        AutomaticCanvasSize = "Y",--]]
 	}, {
 		New("UIListLayout", {
-			HorizontalAlignment = "Center",
+			HorizontalAlignment = "Right",
 			SortOrder = "LayoutOrder",
 			VerticalAlignment = "Bottom",
 			Padding = UDim.new(0, 8),
@@ -61,45 +62,22 @@ function NotificationModule.New(Config)
 		CanClose = Config.CanClose ~= false,
 		UIElements = {},
 		Closed = false,
+		Id = NotificationModule.NotificationIndex + 1,
 	}
-	--[[if Notification.CanClose == nil then
-        Notification.CanClose = true
-    end--]]
-	NotificationModule.NotificationIndex = NotificationModule.NotificationIndex + 1
-	NotificationModule.Notifications[NotificationModule.NotificationIndex] = Notification
 
-	-- local UIStroke = New("UIStroke", {
-	--     ThemeTag = {
-	--         Color = "Text"
-	--     },
-	--     Transparency = 1, -- - .9
-	--     Thickness = .6,
-	-- })
+	NotificationModule.NotificationIndex = Notification.Id
+	table.insert(NotificationModule.Notifications, Notification)
+
+	-- Maksimum bildirim limitini kontrol et ve eskileri kapat
+	if #NotificationModule.Notifications > NotificationModule.MaxNotifications then
+		local oldestNotification = NotificationModule.Notifications[1]
+		if oldestNotification and not oldestNotification.Closed then
+			oldestNotification:Close()
+		end
+	end
 
 	local Icon
-
 	if Notification.Icon then
-		-- if Creator.Icon(Notification.Icon) and Creator.Icon(Notification.Icon)[2] then
-		--     Icon = New("ImageLabel", {
-		--         Size = UDim2.new(0,26,0,26),
-		--         Position = UDim2.new(0,NotificationModule.UIPadding,0,NotificationModule.UIPadding),
-		--         BackgroundTransparency = 1,
-		--         Image = Creator.Icon(Notification.Icon)[1],
-		--         ImageRectSize = Creator.Icon(Notification.Icon)[2].ImageRectSize,
-		--         ImageRectOffset = Creator.Icon(Notification.Icon)[2].ImageRectPosition,
-		--         ThemeTag = {
-		--             ImageColor3 = "Text"
-		--         }
-		--     })
-		-- elseif string.find(Notification.Icon, "rbxassetid") then
-		--     Icon = New("ImageLabel", {
-		--         Size = UDim2.new(0,26,0,26),
-		--         BackgroundTransparency = 1,
-		--         Position = UDim2.new(0,NotificationModule.UIPadding,0,NotificationModule.UIPadding),
-		--         Image = Notification.Icon
-		--     })
-		-- end
-
 		Icon = Creator.Image(
 			Notification.Icon,
 			Notification.Title .. ":" .. Notification.Icon,
@@ -110,7 +88,6 @@ function NotificationModule.New(Config)
 		)
 		Icon.Size = UDim2.new(0, 26, 0, 26)
 		Icon.Position = UDim2.new(0, NotificationModule.UIPadding, 0, NotificationModule.UIPadding)
-		-- Icon.LayoutOrder = -1
 	end
 
 	local CloseButton
@@ -123,9 +100,7 @@ function NotificationModule.New(Config)
 			Size = UDim2.new(0, 16, 0, 16),
 			Position = UDim2.new(1, -NotificationModule.UIPadding, 0, NotificationModule.UIPadding),
 			AnchorPoint = Vector2.new(1, 0),
-			ThemeTag = {
-				ImageColor3 = "Text",
-			},
+			ThemeTag = { ImageColor3 = "Text" },
 			ImageTransparency = 0.4,
 		}, {
 			New("TextButton", {
@@ -144,7 +119,6 @@ function NotificationModule.New(Config)
 			ImageTransparency = "NotificationDurationTransparency",
 			ImageColor3 = "NotificationDuration",
 		},
-		--Visible = false,
 	})
 
 	local TextContainer = New("Frame", {
@@ -175,9 +149,7 @@ function NotificationModule.New(Config)
 			Text = Notification.Title,
 			FontFace = Font.new(Creator.Font, Enum.FontWeight.SemiBold),
 		}),
-		New("UIListLayout", {
-			Padding = UDim.new(0, NotificationModule.UIPadding / 3),
-		}),
+		New("UIListLayout", { Padding = UDim.new(0, NotificationModule.UIPadding / 3) }),
 	})
 
 	if Notification.Content then
@@ -188,7 +160,6 @@ function NotificationModule.New(Config)
 			TextXAlignment = "Left",
 			RichText = true,
 			BackgroundTransparency = 1,
-			--TextTransparency = .4,
 			TextSize = 15,
 			ThemeTag = {
 				TextColor3 = "NotificationContent",
@@ -202,14 +173,10 @@ function NotificationModule.New(Config)
 
 	local Main = Creator.NewRoundFrame(NotificationModule.UICorner, "Squircle", {
 		Size = UDim2.new(1, 0, 0, 0),
-		Position = UDim2.new(2, 0, 1, 0),
-		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(1.5, 0, 0, 0), -- Sağdan gelecek şekilde başlat
 		AutomaticSize = "Y",
 		ImageTransparency = 0.05,
-		ThemeTag = {
-			ImageColor3 = "Notification",
-		},
-		--ZIndex = 20
+		ThemeTag = { ImageColor3 = "Notification" },
 	}, {
 		Creator.NewRoundFrame(NotificationModule.UICorner, "Glass-1", {
 			Size = UDim2.new(1, 0, 1, 0),
@@ -224,16 +191,10 @@ function NotificationModule.New(Config)
 			Name = "DurationFrame",
 		}, {
 			New("Frame", {
-				Size = UDim2.new(1, 0, 1, 0), -- 0,0,1,0
+				Size = UDim2.new(1, 0, 1, 0),
 				BackgroundTransparency = 1,
 				ClipsDescendants = true,
-			}, {
-				Duration,
-			}),
-
-			-- New("UICorner", {
-			--     CornerRadius = UDim.new(0,NotificationModule.UICorner),
-			-- })
+			}, { Duration }),
 		}),
 		New("ImageLabel", {
 			Name = "Background",
@@ -242,13 +203,7 @@ function NotificationModule.New(Config)
 			Size = UDim2.new(1, 0, 1, 0),
 			ScaleType = "Crop",
 			ImageTransparency = Notification.BackgroundImageTransparency,
-			--ZIndex = 19,
-		}, {
-			New("UICorner", {
-				CornerRadius = UDim.new(0, NotificationModule.UICorner),
-			}),
-		}),
-
+		}, { New("UICorner", { CornerRadius = UDim.new(0, NotificationModule.UICorner) }) }),
 		TextContainer,
 		Icon,
 		CloseButton,
@@ -257,70 +212,100 @@ function NotificationModule.New(Config)
 	local MainContainer = New("Frame", {
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0, 0),
+		ClipsDescendants = false,
 		Parent = Config.Holder,
-	}, {
-		Main,
-	})
+	}, { Main })
 
-	function Notification:Close()
-		if not Notification.Closed then
-			Notification.Closed = true
-			Tween(
-				MainContainer,
-				0.45,
-				{ Size = UDim2.new(1, 0, 0, -8) },
-				Enum.EasingStyle.Quint,
-				Enum.EasingDirection.Out
-			):Play()
-			Tween(
-				Main,
-				0.55,
-				{ Position = UDim2.new(2, 0, 1, 0) },
-				Enum.EasingStyle.Quint,
-				Enum.EasingDirection.Out
-			):Play()
-			task.wait(0.45)
-			MainContainer:Destroy()
+	-- Swipe-to-Dismiss (Kaydırarak Kapatma) Mantığı
+	local dragging = false
+	local dragStart = nil
+	local startPos = nil
+
+	Creator.AddSignal(Main.InputBegan, function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position.X
+			startPos = Main.Position.X.Scale
 		end
+	end, Main)
+
+	Creator.AddSignal(UserInputService.InputChanged, function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			local deltaX = input.Position.X - dragStart
+			-- Sadece sağa doğru kaydırmaya izin ver (hafifçe sola da gidebilir ama direnç uygula)
+			local newX = math.max(0, deltaX / Main.AbsoluteSize.X)
+			Main.Position = UDim2.new(newX, 0, 0, 0)
+			Main.ImageTransparency = 0.05 + (newX * 0.5) -- Kaydırdıkça şeffaflaş
+		end
+	end)
+
+	Creator.AddSignal(UserInputService.InputEnded, function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+			dragging = false
+			local currentXScale = Main.Position.X.Scale
+			
+			if currentXScale > 0.4 then
+				-- Eğer %40'dan fazla sağa kaydırıldıysa kapat
+				Notification:Close(true)
+			else
+				-- Yeterince kaydırılmadıysa geri yaylan
+				Tween(Main, 0.45, { Position = UDim2.new(0, 0, 0, 0), ImageTransparency = 0.05 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+			end
+		end
+	end)
+
+	local isClosing = false
+
+	function Notification:Close(isSwiped)
+		if isClosing then return end
+		isClosing = true
+		Notification.Closed = true
+
+		-- Listeden kaldır
+		for i, notif in ipairs(NotificationModule.Notifications) do
+			if notif.Id == Notification.Id then
+				table.remove(NotificationModule.Notifications, i)
+				break
+			end
+		end
+
+		if isSwiped then
+			-- Zaten sağa kaydırıldığı için sadece container'ı küçült ve dışarı kaydır
+			Tween(Main, 0.3, { Position = UDim2.new(1.5, 0, 0, 0), ImageTransparency = 1 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+		else
+			-- Normal kapanış, sağa doğru çıkar
+			Tween(Main, 0.45, { Position = UDim2.new(1.5, 0, 0, 0), ImageTransparency = 1 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+		end
+
+		Tween(MainContainer, 0.45, { Size = UDim2.new(1, 0, 0, 0) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+		
+		task.wait(0.45)
+		Creator.DisconnectObjectSignals(Main)
+		MainContainer:Destroy()
 	end
 
 	task.spawn(function()
 		task.wait()
-		Tween(
-			MainContainer,
-			0.45,
-			{ Size = UDim2.new(1, 0, 0, Main.AbsoluteSize.Y) },
-			Enum.EasingStyle.Quint,
-			Enum.EasingDirection.Out
-		):Play()
-		Tween(
-			Main,
-			0.45,
-			{ Position = UDim2.new(0, 0, 1, 0) },
-			Enum.EasingStyle.Quint,
-			Enum.EasingDirection.Out
-		):Play()
+		-- Animasyonlu geliş
+		Tween(MainContainer, 0.45, { Size = UDim2.new(1, 0, 0, Main.AbsoluteSize.Y) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+		Tween(Main, 0.45, { Position = UDim2.new(0, 0, 0, 0) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+		
 		if Notification.Duration then
 			Duration.Size = UDim2.new(0, Main.DurationFrame.AbsoluteSize.X, 1, 0)
-			Tween(
-				Main.DurationFrame.Frame,
-				Notification.Duration,
-				{ Size = UDim2.new(0, 0, 1, 0) },
-				Enum.EasingStyle.Linear,
-				Enum.EasingDirection.InOut
-			):Play()
+			Tween(Main.DurationFrame.Frame, Notification.Duration, { Size = UDim2.new(0, 0, 1, 0) }, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut):Play()
 			task.wait(Notification.Duration)
-			Notification:Close()
+			if not Notification.Closed then
+				Notification:Close()
+			end
 		end
 	end)
 
 	if CloseButton then
 		Creator.AddSignal(CloseButton.TextButton.MouseButton1Click, function()
 			Notification:Close()
-		end)
+		end, Main)
 	end
 
-	--Tween():Play()
 	return Notification
 end
 
