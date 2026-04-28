@@ -632,12 +632,12 @@ function TabModule:SelectTab(TabIndex)
 
 		for _, TabObject in next, TabModule.Tabs do
 			if not TabObject.Locked then
-				Creator.SetThemeTag(TabObject.UIElements.Main, {
-					ImageTransparency = "TabBorderTransparency",
+				Creator.SetThemeTag(TabObject.UIElements.Main.Frame, {
+					ImageTransparency = 1,
 				}, 0.15)
 				if TabObject.Border then
 					Creator.SetThemeTag(TabObject.UIElements.Main.Outline, {
-						ImageTransparency = "TabBorderTransparency",
+						ImageTransparency = 1,
 					}, 0.15)
 				end
 				Creator.SetThemeTag(TabObject.UIElements.Main.Frame.TextLabel, {
@@ -651,8 +651,9 @@ function TabModule:SelectTab(TabIndex)
 				TabObject.Selected = false
 			end
 		end
-		Creator.SetThemeTag(TabModule.Tabs[TabIndex].UIElements.Main, {
+		Creator.SetThemeTag(TabModule.Tabs[TabIndex].UIElements.Main.Frame, {
 			ImageTransparency = "TabBackgroundActiveTransparency",
+			ImageColor3 = "TabBackgroundActive",
 		}, 0.15)
 		if TabModule.Tabs[TabIndex].Border then
 			Creator.SetThemeTag(TabModule.Tabs[TabIndex].UIElements.Main.Outline, {
@@ -693,6 +694,16 @@ function TabModule:SelectTab(TabIndex)
 					{ Scale = 1 },
 					Enum.EasingStyle.Back,
 					Enum.EasingDirection.Out
+				)
+					:Play()
+			end
+		end)
+
+		TabModule.OnChangeFunc(TabIndex)
+	end
+end
+
+return TabModule
 				)
 					:Play()
 			end

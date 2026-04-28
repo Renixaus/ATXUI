@@ -105,16 +105,36 @@ return {
 						frame:Highlight()
 					end
 					function content:Destroy()
+						if frame.UIElements and frame.UIElements.Main then
+							Creator.DisconnectObjectSignals(frame.UIElements.Main)
+						end
 						frame:Destroy()
 
 						table.remove(Window.AllElements, config.GlobalIndex)
 						table.remove(tbl.Elements, config.Index)
-						table.remove(Tab.Elements, config.Index)
+						if Tab then
+							table.remove(Tab.Elements, config.Index)
+						end
+
+						-- Update remaining element indexes
+						for i = config.Index, #tbl.Elements do
+							local el = tbl.Elements[i]
+							el.Index = i
+							-- Update GlobalIndex if possible
+						end
+						
+						for i = config.GlobalIndex, #Window.AllElements do
+							local el = Window.AllElements[i]
+							if el.config then -- If we store config in content
+								el.config.GlobalIndex = i
+							end
+						end
+
 						tbl:UpdateAllElementShapes(tbl)
 					end
 				end
 
-				Window.AllElements[config.Index] = content
+				Window.AllElements[config.GlobalIndex] = content
 				tbl.Elements[config.Index] = content
 				if Tab then
 					Tab.Elements[config.Index] = content
